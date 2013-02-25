@@ -1,0 +1,18 @@
+dugancathal@gmail.com:
+  GOOG: long
+  NFLX: short
+  GOOG130518C00745000: call
+  NFLX130518C00175000: put
+  SIK13.CMX: future
+rpuckett@mines.edu:
+  MSFT: long
+  ANF: short
+  MSFT130622C00025000: call
+  ANF130518P00048000: put
+  KCK14.NYB: future
+adell@mines.edu:
+  TSLA: long
+  S: short
+  TSLA130518C00037000: call
+  S130518P00005500: put
+  LCM13.CME: future

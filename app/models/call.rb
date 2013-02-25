@@ -1,0 +1,2 @@
+class Call < Contract
+end

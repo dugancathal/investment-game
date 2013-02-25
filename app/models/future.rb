@@ -1,0 +1,2 @@
+class Future < Contract
+end

@@ -1,0 +1,16 @@
+#!/usr/bin/env ruby
+
+require 'httparty'
+require File.expand_path('../../config/environment.rb', __FILE__)
+
+# Given a player_id, get the stock values for all of the player's stocks
+
+Player.all.each do |player|
+  puts player.email
+  player.contracts.each do |contract|
+    poll = Poll.retrieve!(contract.ticker)
+    puts "#{poll.ticker.name} #{poll.value}"
+  end
+
+  puts
+end

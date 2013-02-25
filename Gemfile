@@ -45,3 +45,5 @@ gem "binding_of_caller", :group => :development
 gem "thin", :group => [:test, :development]
 gem "simple_form"
 gem "haml-rails"
+gem 'nokogiri'
+gem 'httparty'

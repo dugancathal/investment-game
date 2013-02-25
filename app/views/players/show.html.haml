@@ -1,0 +1,10 @@
+- model_class = Player
+.page-header
+  %h1=t '.title', :default => @player.email
+
+%ul
+  - @player.contracts.each do |contract|
+    %li= link_to contract.ticker.name, player_ticker_path(@player, contract.ticker)
+
+.form-actions
+  = link_to t('.back', :default => t("helpers.links.back")), players_path, :class => 'btn'

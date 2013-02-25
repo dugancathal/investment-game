@@ -1,0 +1,15 @@
+- model_class = Ticker
+.page-header
+  %h1=t '.title', :default => @ticker.name
+
+%ul
+  - @ticker.polls.each do |poll|
+    %li= "#{l poll.created_at}: #{poll.amount}"
+
+.form-actions
+  = link_to t('.back', :default => t("helpers.links.back")), tickers_path, :class => 'btn'
+
+#chart-data
+  %script{type: 'text/javascript'}= @ticker.to_graph_json(@player).html_safe if @player
+
+#chart
