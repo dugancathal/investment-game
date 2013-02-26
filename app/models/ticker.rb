@@ -1,10 +1,12 @@
 class Ticker < ActiveRecord::Base
-  attr_accessible :name
   has_many :polls
   has_many :contracts
   has_many :players, through: :contracts
-
   has_many :profits
+
+  def self.total_ticker
+    Ticker.where(name: 'TOTAL').first_or_create
+  end
 
   def last_poll
     polls.order('created_at desc').first

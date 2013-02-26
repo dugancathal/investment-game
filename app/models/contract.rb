@@ -1,11 +1,14 @@
 class Contract < ActiveRecord::Base
   belongs_to :player
   belongs_to :ticker
-  attr_accessible :commission, :multiplier, :type, :value, :ticker_id, :player_id
+
+  def current_profit
+    current_holdings - starting_holdings
+  end
 
   def calculate_profit!
     puts current_holdings - starting_holdings
-    player.profits.create! value: current_holdings - starting_holdings, ticker_id: self.ticker_id
+    player.profits.create! value: current_profit, ticker_id: self.ticker_id
   end
 
   def current_holdings
@@ -18,5 +21,9 @@ class Contract < ActiveRecord::Base
 
   def polls
     Poll.where(ticker_id: self.ticker_id).order('created_at DESC')
+  end
+
+  def profits
+    Profit.where(ticker_id: self.ticker_id, player_id: player_id).order('created_at DESC')
   end
 end

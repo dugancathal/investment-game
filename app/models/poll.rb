@@ -1,6 +1,5 @@
 class Poll < ActiveRecord::Base
   belongs_to :ticker
-  attr_accessible :value, :ticker_id
 
   YAHOO_FINANCE_ROOT = "http://finance.yahoo.com/"
 

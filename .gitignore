@@ -13,4 +13,8 @@
 # Ignore all logfiles and tempfiles.
 /log/*.log
 /tmp
-config/database.ymlGemfile.lock
+
+config/database.yml
+Gemfile.lock
+
+config/initializers/secret_token.rb
