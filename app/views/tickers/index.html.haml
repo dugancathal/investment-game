@@ -5,7 +5,9 @@
   %thead
     %tr
       %th= model_class.human_attribute_name(:name)
+      %th Last Known Price
   %tbody
     - @tickers.each do |ticker|
       %tr
         %td= link_to ticker.name, ticker
+        %td= ticker.last_poll.amount

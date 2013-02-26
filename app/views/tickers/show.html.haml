@@ -2,9 +2,16 @@
 .page-header
   %h1=t '.title', :default => @ticker.name
 
-%ul
-  - @ticker.polls.each do |poll|
-    %li= "#{l poll.created_at}: #{poll.amount}"
+%table.table
+  %thead
+    %tr
+      %th Poll Time
+      %th Amount
+  %tbody
+    - @ticker.polls.order('created_at DESC').first(15).each do |poll|
+      %tr
+        %td= l poll.created_at
+        %td= poll.amount
 
 .form-actions
   = link_to t('.back', :default => t("helpers.links.back")), tickers_path, :class => 'btn'

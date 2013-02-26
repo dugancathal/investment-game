@@ -1,6 +1,14 @@
 class Ticker < ActiveRecord::Base
   attr_accessible :name
   has_many :polls
+  has_many :contracts
+  has_many :players, through: :contracts
+
+  has_many :profits
+
+  def last_poll
+    polls.order('created_at desc').first
+  end
 
   def prices
     polls.map(&:value)
@@ -11,7 +19,9 @@ class Ticker < ActiveRecord::Base
   end
 
   def profits_for(player)
-    []
+    if player
+      player.profits.where(ticker_id: self.id).pluck(:value)
+    end
   end
   
   def to_graph_json(player)

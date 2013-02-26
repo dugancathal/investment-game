@@ -13,6 +13,6 @@ class Poll < ActiveRecord::Base
   end
 
   def amount
-    "$" + value.to_s
+    "$%.2f" % value
   end
 end

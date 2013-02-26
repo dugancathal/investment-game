@@ -2,9 +2,21 @@
 .page-header
   %h1=t '.title', :default => @player.email
 
-%ul
-  - @player.contracts.each do |contract|
-    %li= link_to contract.ticker.name, player_ticker_path(@player, contract.ticker)
+%h3 Contracts
+%table.table
+  %thead
+    %tr
+      %th Ticker
+      %th Number Bought
+      %th Options/Stocks per Contract
+      %th Commission
+  %tbody
+    - @player.contracts.each do |contract|
+      %tr
+        %td= link_to contract.ticker.name, player_ticker_path(@player, contract.ticker)
+        %td= contract.value
+        %td= contract.multiplier.abs
+        %td= contract.commission
 
 .form-actions
   = link_to t('.back', :default => t("helpers.links.back")), players_path, :class => 'btn'
