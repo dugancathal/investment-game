@@ -20,10 +20,28 @@ class Contract < ActiveRecord::Base
   end
 
   def polls
-    Poll.where(ticker_id: self.ticker_id).order('created_at DESC')
+    Poll.where(ticker_id: self.ticker_id)
+  end
+
+  def poll_dates
+    polls.order('created_at ASC').pluck(:created_at).map(&:to_date)
   end
 
   def profits
-    Profit.where(ticker_id: self.ticker_id, player_id: player_id).order('created_at DESC')
+    Profit.where(ticker_id: self.ticker_id, player_id: player_id)
+  end
+
+  def profit_values
+    profits.where(ticker_id: self.ticker_id).order('created_at ASC').pluck(:value)
+  end
+
+  def to_graph_json
+    { 
+      title: ticker.name, 
+      contract_type: type.underscore,
+      poll_dates: poll_dates,
+      prices: ticker.prices,
+      profits: profit_values,
+    }.to_json
   end
 end

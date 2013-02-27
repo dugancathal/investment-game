@@ -14,4 +14,8 @@ class Poll < ActiveRecord::Base
   def amount
     "$%.2f" % value
   end
+
+  def self.poll_dates
+    (minimum('created_at').to_date..Date.today).to_a
+  end
 end

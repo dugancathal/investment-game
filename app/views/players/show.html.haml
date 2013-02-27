@@ -20,3 +20,8 @@
 
 .form-actions
   = link_to t('.back', :default => t("helpers.links.back")), players_path, :class => 'btn'
+
+#chart-data
+  %script{type: 'text/javascript'}= @player.to_graph_json.html_safe
+
+#chart

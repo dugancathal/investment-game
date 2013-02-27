@@ -17,6 +17,6 @@
   = link_to t('.back', :default => t("helpers.links.back")), tickers_path, :class => 'btn'
 
 #chart-data
-  %script{type: 'text/javascript'}= @ticker.to_graph_json(@player).html_safe if @player
+  %script{type: 'text/javascript'}= Contract.where(ticker_id: @ticker.id, player_id: @player.id).first.to_graph_json.html_safe
 
 #chart
