@@ -42,7 +42,7 @@ gem "twitter-bootstrap-rails", :group => :assets
 gem "less-rails", :group => :assets
 gem "better_errors", :group => :development
 gem "binding_of_caller", :group => :development
-gem "thin", :group => [:test, :development]
+#gem "thin", :group => [:test, :development]
 gem "simple_form"
 gem "haml-rails"
 gem 'nokogiri'
