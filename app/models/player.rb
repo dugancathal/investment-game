@@ -9,7 +9,7 @@ class Player < ActiveRecord::Base
 
   def total_profit
     contracts.map do |contract| 
-      contract.profits.first.try(:value) || 0
+      contract.profits.order('created_at DESC').first.try(:value) || 0
     end.reduce(:+)
   end
 

@@ -9,6 +9,8 @@ class Poll < ActiveRecord::Base
     amount = doc.css('.time_rtq_ticker span').text()
     date_range = Date.today.beginning_of_day..Date.today.end_of_day
     where(ticker_id: ticker.id, value: amount, created_at: date_range).first_or_create!
+  rescue SocketError
+    retry
   end
 
   def amount

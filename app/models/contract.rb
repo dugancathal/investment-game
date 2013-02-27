@@ -7,16 +7,15 @@ class Contract < ActiveRecord::Base
   end
 
   def calculate_profit!
-    puts current_holdings - starting_holdings
     player.profits.create! value: current_profit, ticker_id: self.ticker_id
   end
 
   def current_holdings
-    polls.first.value * value * multiplier + commission
+    polls.order('created_at DESC').first.value * value * multiplier + commission
   end
 
   def starting_holdings
-    polls.last.value * value * multiplier + commission
+    polls.order('created_at DESC').last.value * value * multiplier + commission
   end
 
   def polls

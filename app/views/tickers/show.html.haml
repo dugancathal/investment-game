@@ -14,7 +14,7 @@
         %td= poll.amount
 
 .form-actions
-  = link_to t('.back', :default => t("helpers.links.back")), tickers_path, :class => 'btn'
+  = link_to t('.back', :default => t("helpers.links.back")), player_path(@player), :class => 'btn'
 
 #chart-data
   %script{type: 'text/javascript'}= Contract.where(ticker_id: @ticker.id, player_id: @player.id).first.to_graph_json.html_safe
