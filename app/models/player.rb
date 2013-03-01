@@ -8,6 +8,8 @@ class Player < ActiveRecord::Base
   has_many :tickers, through: :contracts
   has_many :profits
 
+  attr_accessor :config_file
+
   def username
     email.split('@').first
   end

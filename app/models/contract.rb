@@ -1,8 +1,36 @@
 class Contract < ActiveRecord::Base
+  VALID_CONTRACT_TYPES = %w(call future long put short)
   belongs_to :player
   belongs_to :ticker
 
   delegate :name, to: :ticker, prefix: true, allow_nil: true
+
+  def self.from_file_for_player(file, player)
+    config = YAML::load(file.read)
+    config.each do |ticker, type|
+      next unless VALID_CONTRACT_TYPES.include?(type.downcase)
+      klass = data['type'].classify.constantize
+      ticker = Ticker.where(name: ticker).first_or_create!
+      number_bought = purchasable_items_for_amount(ticker)
+      klass.new(ticker_id: ticker.id,
+        player_id: player.id, value: number_bought,
+        multiplier: klass.multiplier,
+        commission: klass.commission_for(number_bought))
+    end
+  end
+
+  def self.multiplier
+    1
+  end
+
+  def self.purchasable_items_for_amount(ticker, amount = 20000)
+    current_price = Poll.retrieve(ticker).value
+    (20000 / current_price).floor
+  end
+
+  def self.commission_for(number)
+    -8.95
+  end
 
   def current_profit
     current_holdings - starting_holdings

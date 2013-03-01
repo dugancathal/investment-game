@@ -45,6 +45,7 @@ gem "better_errors", :group => :development
 gem "binding_of_caller", :group => :development
 gem "thin"
 gem "simple_form"
+gem 'nested_form'
 gem "haml-rails"
 gem 'nokogiri'
 gem 'httparty'

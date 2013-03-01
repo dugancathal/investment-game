@@ -1,4 +1,12 @@
 class Put < Contract
+  def self.multiplier
+    -100
+  end
+
+  def self.commission_for(number)
+    -8.95 + (-0.75 * number)
+  end
+
   def to_graph_json
     { 
       title: ticker.name, 

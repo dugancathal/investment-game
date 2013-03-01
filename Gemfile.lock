@@ -81,6 +81,7 @@ GEM
     mime-types (1.21)
     multi_json (1.6.1)
     multi_xml (0.5.2)
+    nested_form (0.3.1)
     nokogiri (1.5.6)
     pg (0.14.1)
     polyglot (0.3.3)
@@ -170,6 +171,7 @@ DEPENDENCIES
   httparty
   jquery-rails
   less-rails
+  nested_form
   nokogiri
   pg
   rails (= 3.2.11)
