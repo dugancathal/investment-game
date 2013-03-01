@@ -1,0 +1,9 @@
+= simple_form_for([@player, @contract]) do |f|
+  = f.error_notification
+
+  .form-inputs
+    = f.input :multiplier, label: 'Items per contract', hint: 'If you are doing a "short", make this negative'
+    = f.input :value, label: 'Number purchased'
+
+  .form-actions
+    = f.button :submit

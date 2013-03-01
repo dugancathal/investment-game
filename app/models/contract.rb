@@ -9,10 +9,10 @@ class Contract < ActiveRecord::Base
     config = YAML::load(file.read)
     config.each do |ticker, type|
       next unless VALID_CONTRACT_TYPES.include?(type.downcase)
-      klass = data['type'].classify.constantize
+      klass = type.classify.constantize
       ticker = Ticker.where(name: ticker).first_or_create!
-      number_bought = purchasable_items_for_amount(ticker)
-      klass.new(ticker_id: ticker.id,
+      number_bought = purchasable_items_for_amount(ticker, klass.multiplier)
+      klass.create!(ticker_id: ticker.id,
         player_id: player.id, value: number_bought,
         multiplier: klass.multiplier,
         commission: klass.commission_for(number_bought))
@@ -23,9 +23,9 @@ class Contract < ActiveRecord::Base
     1
   end
 
-  def self.purchasable_items_for_amount(ticker, amount = 20000)
+  def self.purchasable_items_for_amount(ticker, multiplier, amount = 20000)
     current_price = Poll.retrieve(ticker).value
-    (20000 / current_price).floor
+    (20000 / current_price).floor / multiplier.abs
   end
 
   def self.commission_for(number)
@@ -72,5 +72,14 @@ class Contract < ActiveRecord::Base
       prices: ticker.prices,
       profits: profit_values,
     }.to_json
+  end
+
+  def self.inherited child
+    child.instance_eval do
+      def model_name
+        Contract.model_name
+      end
+    end
+    super
   end
 end
