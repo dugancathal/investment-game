@@ -2,6 +2,8 @@ class Contract < ActiveRecord::Base
   belongs_to :player
   belongs_to :ticker
 
+  delegate :name, to: :ticker, prefix: true, allow_nil: true
+
   def current_profit
     current_holdings - starting_holdings
   end

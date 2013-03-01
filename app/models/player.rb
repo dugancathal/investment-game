@@ -1,7 +1,16 @@
 class Player < ActiveRecord::Base
   has_many :contracts
+  has_many :longs
+  has_many :shorts
+  has_many :calls
+  has_many :puts
+  has_many :futures
   has_many :tickers, through: :contracts
   has_many :profits
+
+  def username
+    email.split('@').first
+  end
 
   def calculate_total_profit!
     profits.create value: total_profit, ticker_id: Ticker.total_ticker.id

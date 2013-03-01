@@ -20,4 +20,8 @@ class Poll < ActiveRecord::Base
   def self.poll_dates
     (minimum('created_at').to_date..Date.today).to_a
   end
+
+  def self.friday_dates
+    select('DISTINCT(created_at)').select {|date| date.friday?}
+  end
 end

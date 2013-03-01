@@ -1,0 +1,135 @@
+#!/usr/bin/env ruby
+
+require 'csv'
+require 'optparse'
+require 'active_record'
+
+options = {}
+
+OptionParser.new do |opts|
+
+  opts.banner = "Usage: ./table_generator.rb [OPTIONS]"
+
+  opts.on( "-e", "--email EMAIL", "This is the email address of the player" ) do |e|
+    options[:email] = e
+  end
+
+  opts.on( "-d", "--db FILE", "This is the database file to use", "Defaults to game.db") do |d|
+    options[:db] = d
+  end
+end.parse!
+
+dbfile = options.delete(:db) || File.join(File.dirname(__FILE__), 'game.db')
+
+DB_CONFIG = {
+  adapter: 'sqlite3',
+  database: dbfile,
+  pool: 5
+}
+
+ActiveRecord::Base.establish_connection DB_CONFIG
+class Poll < ActiveRecord::Base; end
+class Profit < ActiveRecord::Base
+  belongs_to :player
+end
+
+class Player < ActiveRecord::Base
+  has_many :profits
+  has_many :contracts
+
+  def self.has_contracts_with ticker
+    all.map {|p| p if p.contracts.map(&:ticker).include?(ticker) }.compact
+  end
+
+  def contracts_for ticker
+    contracts.find_by_ticker(ticker).value
+  end
+end
+
+class Contract < ActiveRecord::Base
+  belongs_to :player
+end
+
+email = options.delete(:email)
+player = Player.find_by_email email
+username = email.split('@')[0]
+
+require 'spreadsheet'
+
+NUMBER_OF_WEEKS = 10
+book = Spreadsheet::Workbook.new
+sheet1 = book.create_worksheet name: 'Tables'
+
+sheet1[0,0] = "Tables of Data for Investment Game 2012"
+
+
+# Acquire initial data from DB and set up headers
+long_short_part = ["Week", "Stock Price", "Profit/Loss"]
+empty_cell = [""]
+call_put_part = ["Week", "Stock Price", "Strike Price", "Premium", "Profit/Loss"]
+overall_part = ["Week", "Profit/Loss"]
+
+dates = Poll.select("DISTINCT date").order(:date).map(&:date).map {|d| d.to_s}
+/^(?<call_stock>\D+)/ =~ player.call
+/^(?<put_stock>\D+)/ =~ player.put
+players_data = {
+  player.long => {polls: Poll.order(:date).find_all_by_ticker(player.long).map(&:value).map(&:to_f), 
+                  profits: Profit.order(:date).find_all_by_ticker_and_player_id(player.long, player.id).map(&:value).map(&:to_f) },
+
+  player.short => {polls: Poll.order(:date).find_all_by_ticker(player.short).map(&:value).map(&:to_f), 
+                  profits: Profit.order(:date).find_all_by_ticker_and_player_id(player.short, player.id).map(&:value).map(&:to_f) },
+
+  player.call => {polls: Poll.order(:date).find_all_by_ticker(player.call).map(&:value).map(&:to_f), 
+                  profits: Profit.order(:date).find_all_by_ticker_and_player_id(player.call, player.id).map(&:value).map(&:to_f),
+                  stock_polls: Poll.order(:date).find_all_by_ticker(call_stock).map(&:value).map(&:to_f) },
+
+  player.put => {polls: Poll.order(:date).find_all_by_ticker(player.put).map(&:value).map(&:to_f), 
+                  profits: Profit.order(:date).find_all_by_ticker_and_player_id(player.put, player.id).map(&:value).map(&:to_f),
+                  stock_polls: Poll.order(:date).find_all_by_ticker(put_stock).map(&:value).map(&:to_f) },
+
+  player.future => {polls: Poll.order(:date).find_all_by_ticker(player.future).map(&:value).map(&:to_f), 
+                  profits: Profit.order(:date).find_all_by_ticker_and_player_id(player.future, player.id).map(&:value).map(&:to_f) },
+                  
+  :total_p_l => Profit.order(:date).find_all_by_ticker_and_player_id('TOTAL', player.id).map(&:value).map(&:to_f),
+  call_strike: player.call_strike.to_f,
+  put_strike: player.put_strike.to_f
+}
+
+# Fill in the Long, Short and Call Data
+NUMBER_OF_WEEKS.times do |i|
+  row = []
+  row += [ i, players_data[player.long][:polls][i], players_data[player.long][:profits][i] ]
+  row += empty_cell
+  row += [ i, players_data[player.short][:polls][i], players_data[player.short][:profits][i] ]
+  row += empty_cell
+  row += [ i, players_data[player.call][:stock_polls][i], players_data[:call_strike], players_data[player.call][:polls][i], players_data[player.call][:profits][i] ]
+  sheet1.row(i+5).replace row
+end
+
+# Fill in the Future, P/L, and Put Data
+NUMBER_OF_WEEKS.times do |i|
+  row = []
+  row += [ i, players_data[player.future][:polls][i], players_data[player.future][:profits][i] ]
+  row += empty_cell
+  row += [ i, players_data[:total_p_l][i] ]
+  row += empty_cell
+  row += empty_cell
+  row += [ i, players_data[player.put][:stock_polls][i], players_data[:put_strike], players_data[player.put][:polls][i], players_data[player.put][:profits][i] ]
+  sheet1.row(i+19).replace row
+end
+
+# Add the Headers for each data set
+sheet1.row(3).replace empty_cell + ["Long Position - #{player.long}"] + empty_cell*3 + ["Short Position - #{player.short}"] + empty_cell*4 + ["Call Option - #{player.call}"]
+sheet1.row(17).replace empty_cell + ["Long Position - #{player.future}"] + empty_cell*3 + ["Total Profit/Loss"] + empty_cell*4 + ["Put Option - #{player.put}"]
+sheet1.row(4).replace long_short_part + empty_cell + long_short_part + empty_cell + call_put_part
+sheet1.row(18).replace long_short_part + empty_cell + overall_part + empty_cell + empty_cell + call_put_part
+
+# Fill in Contract Counts into Column P
+sheet1[3, 15] = 'Contract Counts'
+[:long, :short, :call, :put, :future].each_with_index do |stock_type, i|
+  sheet1[4+i, 15] = stock_type.to_s.titlecase
+  sheet1[4+i, 16] = Contract.find_by_player_id_and_ticker(player.id, player.send(stock_type)).value
+end
+
+
+book.write "spreadsheets/tables#{player.id}.xls"
