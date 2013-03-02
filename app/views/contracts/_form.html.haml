@@ -4,6 +4,7 @@
   .form-inputs
     = f.input :multiplier, label: 'Items per contract', hint: 'If you are doing a "short", make this negative'
     = f.input :value, label: 'Number purchased'
+    = f.input :commission, hint: 'This should be negative'
 
   .form-actions
     = f.button :submit

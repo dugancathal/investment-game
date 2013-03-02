@@ -33,7 +33,7 @@ class Contract < ActiveRecord::Base
   end
 
   def current_profit(options = {})
-    as_of = options.delete(:as_of) || poll.order('created_at DESC')
+    as_of = options.delete(:as_of) || Poll.order('created_at DESC').first
     current_holdings(as_of) - starting_holdings
   end
 
@@ -41,7 +41,7 @@ class Contract < ActiveRecord::Base
     player.profits.create! value: current_profit, ticker_id: self.ticker_id
   end
 
-  def current_holdings(poll = polls.order('created_at DESC'))
+  def current_holdings(poll = polls.order('created_at DESC').first)
     poll.value * value * multiplier + commission
   end
 
