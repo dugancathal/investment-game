@@ -60,4 +60,12 @@ class PlayersController < ApplicationController
       format.json { head :no_content }
     end
   end
+
+  def download
+    @player = Player.find(params[:id])
+    spreadsheet = ReportSpreadsheet.new(@player)
+    spreadsheet.generate!
+
+    send_file spreadsheet.filename
+  end
 end

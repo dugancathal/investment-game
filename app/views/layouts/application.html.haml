@@ -36,6 +36,14 @@
         .span9
           = bootstrap_flash
           = yield
+        - if @player
+          .span3
+            .well.sidebar-nav
+              %h3 The Boring Shit
+              %ul.nav.nav-list
+                %li= link_to "The Report Template", '/IntermediateReport.xls'
+                %li= link_to "Your Report", download_player_path(@player)
+
     
       %footer
         %p &copy; CPWN 2013
