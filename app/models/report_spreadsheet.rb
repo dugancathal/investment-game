@@ -33,12 +33,37 @@ class ReportSpreadsheet
   end
 
   def write_long_short_call
+    call_stock = @player.call.ticker.related_stock.contract_for(@player)
+    poll_dates.each_with_index do |date, i|
+      row = []
+      row += [ i, @player.long.poll_on(date).value, @player.long.profit_on(date).value ]
+      row += EMPTY_CELL
+      row += [ i, @player.short.poll_on(date).value, @player.short.profit_on(date).value ]
+      row += EMPTY_CELL
+      row += [ i, call_stock.poll_on(date).value, @player.call.poll_on(date).value, @player.call.poll_on(date).value, @player.call.profit_on(date).value ]
+      @sheet.row(i+5).replace row
+    end
   end
 
   def write_future_pl_put
+    put_stock = @player.put.ticker.related_stock.contract_for(@player)
+    poll_dates.each_with_index do |date, i|
+      row = []
+      row += [ i, @player.future.poll_on(date).value, @player.future.profit_on(date).value ]
+      row += EMPTY_CELL
+      row += [ i, @player.pl_for_date(date)]
+      row += EMPTY_CELL + EMPTY_CELL
+      row += [ i, put_stock.poll_on(date).value, @player.put.poll_on(date).value, @player.put.poll_on(date).value, @player.put.profit_on(date).value ]
+      @sheet.row(i+19).replace row
+    end
   end
 
   def write_contract_counts
+    @sheet[3, 15] = 'Contract Counts'
+    [:long, :short, :call, :put, :future].each_with_index do |stock_type, i|
+      @sheet[4+i, 15] = stock_type.to_s.titlecase
+      @sheet[4+i, 16] = Contract.where(player_id: @player.id, type: stock_type.to_s.classify).first.value
+    end
   end
 
   # Header rows are as follows (in CSV)

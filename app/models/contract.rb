@@ -65,6 +65,14 @@ class Contract < ActiveRecord::Base
     profits.where(ticker_id: self.ticker_id).order('created_at ASC').pluck(:value)
   end
 
+  def poll_on(date)
+    polls.where(created_at: date.beginning_of_day..date.end_of_day).first
+  end
+
+  def profit_on(date)
+    polls.where(created_at: date.beginning_of_day..date.end_of_day).first
+  end
+
   def to_graph_json
     { 
       title: ticker.name, 

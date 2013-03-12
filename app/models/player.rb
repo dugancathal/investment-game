@@ -28,6 +28,16 @@ class Player < ActiveRecord::Base
     profits.order('created_at ASC').where(ticker_id: Ticker.total_ticker).pluck(:value)
   end
 
+  %w(long short call put future).each do |stock_type|
+    define_method "#{stock_type}" do
+      send(stock_type.pluralize).first
+    end
+  end
+
+  def pl_for_date(date)
+    profits.where(created_at: date.beginning_of_day..date.end_of_day, ticker_id: Ticker.total_ticker.id).first
+  end
+
   def to_graph_json
     { 
       "title" => 'Total P/L', 

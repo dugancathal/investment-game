@@ -7,13 +7,10 @@ class Future < Contract
     player.profits.create! value: profit_value, ticker_id: self.ticker_id
   end
 
-  def polls
-    Poll.where(ticker_id: self.ticker_id).order('created_at DESC')
-  end
-
   private
 
   def profit_value
-    (polls.first.value - polls.last.value) * value * multiplier + commission
+    profitable_polls = polls.order('created_at DESC')
+    (profitable_polls.first.value - profitable_polls.last.value) * value * multiplier + commission
   end
 end

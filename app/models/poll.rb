@@ -28,6 +28,6 @@ class Poll < ActiveRecord::Base
   end
 
   def self.friday_dates
-    select('DISTINCT(created_at)').select {|date| date.friday?}
+    select('DISTINCT(created_at)').pluck(:created_at).map(&:to_date).select {|date| date.friday? }.uniq
   end
 end
